@@ -1,0 +1,23 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.572
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{888888A0-9F3D-457C-B088-3A5042F75D52}") = "ANN_Examensarbete", "ANN_Examensarbete\ANN_Examensarbete.pyproj", "{7048344A-2503-4ADF-B4D1-861E35EEE1AF}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Debug|Any CPU = Debug|Any CPU
+		Release|Any CPU = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{7048344A-2503-4ADF-B4D1-861E35EEE1AF}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{7048344A-2503-4ADF-B4D1-861E35EEE1AF}.Release|Any CPU.ActiveCfg = Release|Any CPU
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {D9029939-F210-4ABB-BE90-03BDA9EBB666}
+	EndGlobalSection
+EndGlobal
