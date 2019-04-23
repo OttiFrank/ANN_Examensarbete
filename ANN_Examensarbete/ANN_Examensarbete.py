@@ -7,8 +7,7 @@ from sklearn.preprocessing import LabelEncoder
 from sklearn.preprocessing import MinMaxScaler
 from sklearn.metrics import mean_squared_error
 from keras.models import Sequential
-from keras.layers import Dense
-from keras.layers import LSTM
+from keras.layers import Dense, Dropout, LSTM
 
 # Convert series to supervised learning
 def series_to_supervised(values, n_in=1, n_out=1, dropnan=True):
@@ -41,13 +40,14 @@ values = dataset.values
 
 # integer encode direction
 encoder = LabelEncoder()
+# values[:,1] = encoder.fit_transform(values[:,1])
 # ensure all data is float
 values = values.astype('float32')
 #normalize features
 scaler = MinMaxScaler(feature_range=(0,1))
 scaled = scaler.fit_transform(values)
 # frame as supervised learning
-n_hours = 3
+n_hours = 1
 n_features = 13
 reframed = series_to_supervised(scaled, n_hours,1 )
 print(reframed.shape)
@@ -68,14 +68,26 @@ train_X = train_X.reshape((train_X.shape[0], n_hours, n_features))
 test_X = test_X.reshape((test_X.shape[0], n_hours, n_features))
 print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
+print(train_X.shape)
+print(train_X[0].shape)
+
 # design network
 model = Sequential()
-model.add(LSTM(100, input_shape=(train_X.shape[1], train_X.shape[2])))
+model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))
+
+model.add(LSTM(128))
+model.add(Dropout(0.2))
+
+#model.add(LSTM(128))
+#model.add(Dropout(0.2))
+
 model.add(Dense(1))
-model.add(Dense(32, input_shape=(train_X.shape[1], train_X.shape[2])))
-model.compile(loss='mae', optimizer='adam')
+model.compile(loss='mae', optimizer='adam', metrics=['accuracy'])
+
+print(train_X.shape)
+print(train_y.shape)
 # fit network
-history = model.fit(train_X, train_y, epochs=150, batch_size=343, validation_data=(test_X, test_y), shuffle=False)
+history = model.fit(train_X, train_y, epochs=50, validation_data=(test_X, test_y))
 # plot history
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='test')
@@ -96,4 +108,4 @@ inv_y = scaler.inverse_transform(inv_y)
 inv_y = inv_y[:,0]
 # calculate RMSE
 rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
-print('Test RMSE: %.3f' % rmse)
+print('Test RMSE: %.8f' % rmse)
