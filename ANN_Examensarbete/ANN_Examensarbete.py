@@ -35,7 +35,7 @@ def series_to_supervised(values, n_in=1, n_out=1, dropnan=True):
     return agg
 
 # load dataset
-url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/ML-test.xlsx"
+url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/ML_test.xlsx"
 dataset = pd.read_excel(url, index_col=0, header=0)
 values = dataset.values
 
@@ -56,8 +56,8 @@ print(reframed.shape)
 # split into train and test sets
 values = reframed.values
 n_train_hours = 365 * 24
-train = values[:60, :]
-test = values[60:, :]
+train = values[:686, :]
+test = values[686:, :]
 # split into input and outputs
 n_obs = n_hours * n_features
 train_X, train_y = train[:, :n_obs], train[:, -n_features]
@@ -70,11 +70,12 @@ print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
 # design network
 model = Sequential()
-model.add(LSTM(50, input_shape=(train_X.shape[1], train_X.shape[2])))
+model.add(LSTM(100, input_shape=(train_X.shape[1], train_X.shape[2])))
 model.add(Dense(1))
+model.add(Dense(32, input_shape=(train_X.shape[1], train_X.shape[2])))
 model.compile(loss='mae', optimizer='adam')
 # fit network
-history = model.fit(train_X, train_y, epochs=50, batch_size=72, validation_data=(test_X, test_y), verbose=2, shuffle=False)
+history = model.fit(train_X, train_y, epochs=150, batch_size=343, validation_data=(test_X, test_y), shuffle=False)
 # plot history
 pyplot.plot(history.history['loss'], label='train')
 pyplot.plot(history.history['val_loss'], label='test')
