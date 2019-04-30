@@ -47,25 +47,24 @@ values = values.astype('float32')
 scaler = MinMaxScaler(feature_range=(0,1))
 scaled = scaler.fit_transform(values)
 # frame as supervised learning
-n_hours = 1
-n_features = 13
-reframed = series_to_supervised(scaled, n_hours,1 )
+n_days = 3
+n_features = 8
+reframed = series_to_supervised(scaled, n_days,1 )
 print(reframed.shape)
 
 
 # split into train and test sets
 values = reframed.values
-n_train_hours = 365 * 24
 train = values[:686, :]
 test = values[686:, :]
 # split into input and outputs
-n_obs = n_hours * n_features
+n_obs = n_days * n_features
 train_X, train_y = train[:, :n_obs], train[:, -n_features]
 test_X, test_y = test[:, :n_obs], test[:, -n_features]
 print(train_X.shape, len(train_X), train_y.shape)
 # reshape input to be 3D [samples, timesteps, features]
-train_X = train_X.reshape((train_X.shape[0], n_hours, n_features))
-test_X = test_X.reshape((test_X.shape[0], n_hours, n_features))
+train_X = train_X.reshape((train_X.shape[0], n_days, n_features))
+test_X = test_X.reshape((test_X.shape[0], n_days, n_features))
 print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
 print(train_X.shape)
@@ -73,16 +72,18 @@ print(train_X[0].shape)
 
 # design network
 model = Sequential()
-model.add(LSTM(128, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))
+model.add(LSTM(8, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True))
 
-model.add(LSTM(128))
-model.add(Dropout(0.2))
-
-#model.add(LSTM(128))
+model.add(LSTM(16, return_sequences=True, activation='relu'))
 #model.add(Dropout(0.2))
 
-model.add(Dense(1))
-model.compile(loss='mae', optimizer='adam', metrics=['accuracy'])
+model.add(LSTM(32, return_sequences=True, activation='relu'))
+#model.add(Dropout(0.2))
+
+model.add(LSTM(128))
+
+model.add(Dense(1, activation='linear'))
+model.compile(loss='mse', optimizer='adam')
 
 print(train_X.shape)
 print(train_y.shape)
@@ -96,7 +97,7 @@ pyplot.show()
 
 # make prediction
 yhat = model.predict(test_X)
-test_X = test_X.reshape((test_X.shape[0], n_hours*n_features))
+test_X = test_X.reshape((test_X.shape[0], n_days*n_features))
 # invert scaling for forecast
 inv_yhat = np.concatenate((yhat, test_X[:, -(n_features-1):]), axis=1)
 inv_yhat = scaler.inverse_transform(inv_yhat)
