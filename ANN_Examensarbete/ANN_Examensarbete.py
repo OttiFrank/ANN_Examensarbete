@@ -37,7 +37,7 @@ def series_to_supervised(values, n_in=1, n_out=1, dropnan=True):
     return agg
 
 # load dataset
-url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/ML_test.xlsx"
+url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/dataset_shifted_InSAR_weather.xlsx"
 dataset = pd.read_excel(url, index_col=0, header=0)
 values = dataset.values
 
@@ -135,7 +135,7 @@ print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
 
 # Serialize model to JSON
 model_json = model.to_json()
-with open("model_json", "w") as json_file:
+with open("model.json", "w") as json_file:
         json_file.write(model_json)
 
 # Serialize weights to HDF5
