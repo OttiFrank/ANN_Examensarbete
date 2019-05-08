@@ -77,17 +77,17 @@ print(train_X.shape[2])
 
 # design network
 model = Sequential()
-model.add(LSTM(100, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True, activation='elu'))
+model.add(LSTM(400, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True, activation='elu'))
 #model.add(Dropout(0.2))
 
 #for i in range(7):
-#model.add(LSTM(50, activation='elu', return_sequences=True))
+model.add(LSTM(350, activation='elu', return_sequences=True))
 #model.add(Dropout(0.2))
 
 #model.add(LSTM(8, activation='relu', return_sequences=True))
 #model.add(Dropout(0.20))
 
-model.add(LSTM(100, activation='elu'))
+model.add(LSTM(200, activation='elu'))
 
 
 model.add(Dense(1, activation='linear'))
@@ -96,7 +96,7 @@ model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 print(train_X.shape)
 print(train_y.shape)
 # fit network
-history = model.fit(train_X, train_y, epochs=10, validation_data=(test_X, test_y))
+history = model.fit(train_X, train_y, epochs=30, validation_data=(test_X, test_y))
 
 # Evaluate the model
 scores = model.evaluate(train_X, train_y, verbose=0)
@@ -132,6 +132,7 @@ pyplot.show()
 rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
 print('Test RMSE: %.8f' % rmse)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
+
 
 # Serialize model to JSON
 model_json = model.to_json()
