@@ -37,7 +37,7 @@ def series_to_supervised(values, n_in=1, n_out=1, dropnan=True):
     return agg
 
 # load dataset
-url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/dataset_shifted_InSAR_weather.xlsx"
+url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/dataset_shifted_InSAR_weather_addedTwo.xlsx"
 dataset = pd.read_excel(url, index_col=0, header=0)
 values = dataset.values
 
@@ -51,7 +51,7 @@ scaler = MinMaxScaler(feature_range=(0,1))
 scaled = scaler.fit_transform(values)
 # frame as supervised learning
 n_days = 3
-n_features = 9
+n_features = 11
 reframed = series_to_supervised(scaled, n_days,1 )
 print(reframed.shape)
 
