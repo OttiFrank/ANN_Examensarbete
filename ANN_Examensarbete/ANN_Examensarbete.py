@@ -37,7 +37,7 @@ def series_to_supervised(values, n_in=1, n_out=1, dropnan=True):
     return agg
 
 # load dataset
-url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/dataset_shifted_InSAR_weather_addedTwo.xlsx"
+url="http://users.du.se/~h15marle/GIK258_Examensarbete/Data/dataset.xlsx"
 dataset = pd.read_excel(url, index_col=0, header=0)
 values = dataset.values
 
@@ -53,8 +53,6 @@ scaled = scaler.fit_transform(values)
 n_days = 3
 n_features = 11
 reframed = series_to_supervised(scaled, n_days,1 )
-print(reframed.shape)
-
 
 # split into train and test sets
 values = reframed.values
@@ -70,40 +68,19 @@ train_X = train_X.reshape((train_X.shape[0], n_days, n_features))
 test_X = test_X.reshape((test_X.shape[0], n_days, n_features))
 print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
-print(train_X.shape)
-print('train_X[1]-[2].shape: ')
-print(train_X.shape[1])
-print(train_X.shape[2])
-
 # design network
 model = Sequential()
 model.add(LSTM(400, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True, activation='elu'))
-#model.add(Dropout(0.2))
-
-#for i in range(7):
 model.add(LSTM(350, activation='elu', return_sequences=True))
-#model.add(Dropout(0.2))
-
-#model.add(LSTM(8, activation='relu', return_sequences=True))
-#model.add(Dropout(0.20))
-
 model.add(LSTM(200, activation='elu'))
-
-
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
-print(train_X.shape)
-print(train_y.shape)
 # fit network
 history = model.fit(train_X, train_y, epochs=30, validation_data=(test_X, test_y))
 
 # Evaluate the model
 scores = model.evaluate(train_X, train_y, verbose=0)
-
-print(model.metrics_names[0])
-
-
 
 # plot history
 pyplot.plot(history.history['loss'], label='train')
@@ -113,7 +90,6 @@ pyplot.show()
 
 # make prediction
 yhat = model.predict(test_X)
-print(yhat)
 test_X = test_X.reshape((test_X.shape[0], n_days*n_features))
 # invert scaling for forecast
 inv_yhat = np.concatenate((yhat, test_X[:, -(n_features-1):]), axis=1)
@@ -124,15 +100,14 @@ test_y = test_y.reshape((len(test_y), 1))
 inv_y = np.concatenate((test_y, test_X[:, -(n_features-1):]), axis=1)
 inv_y = scaler.inverse_transform(inv_y)
 inv_y = inv_y[:,0]
-# calculate RMSE
 
 pyplot.plot(inv_yhat)
 pyplot.plot(inv_y)
 pyplot.show()
+# calculate RMSE
 rmse = sqrt(mean_squared_error(inv_y, inv_yhat))
 print('Test RMSE: %.8f' % rmse)
 print("%s: %.2f%%" % (model.metrics_names[1], scores[1]*100))
-
 
 # Serialize model to JSON
 model_json = model.to_json()
@@ -142,17 +117,3 @@ with open("model.json", "w") as json_file:
 # Serialize weights to HDF5
 model.save_weights("model.h5")
 print("Saved model to disk")
-
-# later when you want to load the model and weights
-
-'''
-# load json and create model
-json_file = open('model.json', 'r')
-loaded_model_json = json_file.read()
-json_file.close()
-loaded_model = model_from_json(loaded_model_json)
-# load weights into new model
-loaded_model.load_weights("model.h5")
-print("Loaded model from disk")
-'''
-
