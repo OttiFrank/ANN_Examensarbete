@@ -50,7 +50,7 @@ values = values.astype('float32')
 scaler = MinMaxScaler(feature_range=(0,1))
 scaled = scaler.fit_transform(values)
 # frame as supervised learning
-n_days = 3
+n_days = 1
 n_features = 11
 reframed = series_to_supervised(scaled, n_days,1 )
 
@@ -70,9 +70,9 @@ print(train_X.shape, train_y.shape, test_X.shape, test_y.shape)
 
 # design network
 model = Sequential()
-model.add(LSTM(400, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True, activation='elu'))
-model.add(LSTM(350, activation='elu', return_sequences=True))
-model.add(LSTM(200, activation='elu'))
+model.add(LSTM(450, input_shape=(train_X.shape[1], train_X.shape[2]), return_sequences=True, activation='elu'))
+model.add(LSTM(400, activation='elu', return_sequences=True))
+model.add(LSTM(250, activation='elu'))
 model.add(Dense(1, activation='linear'))
 model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
 
