@@ -74,7 +74,7 @@ model.add(LSTM(450, input_shape=(train_X.shape[1], train_X.shape[2]), return_seq
 model.add(LSTM(400, activation='elu', return_sequences=True))
 model.add(LSTM(250, activation='elu'))
 model.add(Dense(1, activation='linear'))
-model.compile(loss='mse', optimizer='adam', metrics=['accuracy'])
+model.compile(loss='mse', optimizer='adam', metrics=['mae'])
 
 # fit network
 history = model.fit(train_X, train_y, epochs=30, validation_data=(test_X, test_y))
@@ -84,7 +84,7 @@ scores = model.evaluate(train_X, train_y, verbose=0)
 
 # plot history
 pyplot.plot(history.history['loss'], label='train')
-pyplot.plot(history.history['val_loss'], label='test')
+pyplot.plot(history.history['val_loss'], label='test (MSE)')
 pyplot.legend()
 pyplot.show()
 
@@ -117,3 +117,16 @@ with open("model.json", "w") as json_file:
 # Serialize weights to HDF5
 model.save_weights("model.h5")
 print("Saved model to disk")
+
+inv_y = pd.DataFrame([inv_y])
+inv_y = inv_y.shift(n_days, axis=1)
+inv_y = inv_y.transpose()
+inv_y = inv_y.dropna(how='all')
+
+pyplot.plot(inv_yhat)
+pyplot.plot(inv_y)
+pyplot.legend(['Predikterade värden', 'Riktiga värden'])
+pyplot.xlabel('Antal värden', fontsize=14)
+pyplot.ylabel('Millimeter', fontsize=14)
+pyplot.title('Prediktion av marksättning', fontsize=18)
+pyplot.show()
